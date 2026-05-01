@@ -28,14 +28,21 @@ export default function Admin() {
     check()
   }, [])
 
-  const fetchFeedback = async () => {
-    const { data } = await supabase
-      .from("feedback")
-      .select("*")
-      .order("created_at", { ascending: false })
+const fetchFeedback = async () => {
+  const { data, error } = await supabase
+    .from("feedback")
+    .select("*")
+    .order("created_at", { ascending: false })
 
-    setFeedbacks(data || [])
+  console.log("DATA:", data)
+  console.log("ERROR:", error)
+
+  if (!error) {
+    setFeedbacks(data)
   }
+
+  setLoading(false)
+}
 
   const logout = async () => {
     await supabase.auth.signOut()

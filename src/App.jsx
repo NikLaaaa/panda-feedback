@@ -23,34 +23,51 @@ export default function App() {
   const [loginError, setLoginError] = useState(false)
   const [ripples, setRipples] = useState([])
 
-  const handleSubmit = () => {
-    const newErrors = {}
+  const handleSubmit = async () => {
+  const newErrors = {}
 
-    if (!review.trim()) newErrors.review = true
-    if (!suggestion.trim()) newErrors.suggestion = true
+  if (!review.trim()) newErrors.review = true
+  if (!suggestion.trim()) newErrors.suggestion = true
 
-    setErrors(newErrors)
+  setErrors(newErrors)
 
-    if (Object.keys(newErrors).length > 0) {
-      setError(true)
-      setTimeout(() => setError(false), 500)
-      return
-    }
-
-    setLoading(true)
-
-    setTimeout(() => {
-      setLoading(false)
-      setSuccess(true)
-
-      setName("")
-      setReview("")
-      setSuggestion("")
-      setErrors({})
-
-      setTimeout(() => setSuccess(false), 2000)
-    }, 1200)
+  if (Object.keys(newErrors).length > 0) {
+    setError(true)
+    setTimeout(() => setError(false), 500)
+    return
   }
+
+  setLoading(true)
+
+const { data, error } = await supabase
+  .from("feedback")
+  .insert([
+    {
+      name,
+      review,
+      suggestion
+    }
+  ])
+  .select()
+
+  console.log("INSERT:", data, error)
+
+  setLoading(false)
+
+  if (error) {
+    console.log(error)
+    return
+  }
+
+  setSuccess(true)
+
+  setName("")
+  setReview("")
+  setSuggestion("")
+  setErrors({})
+
+  setTimeout(() => setSuccess(false), 2000)
+}
 
   // 💧 ripple
   const createRipple = (e) => {
